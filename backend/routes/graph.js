@@ -5,6 +5,7 @@ const NodeModel = require('../models/Node');
 const EdgeModel = require('../models/Edge');
 const GraphVersion = require('../models/GraphVersion');
 const User = require('../models/User'); // Required for user lookup during invites
+const Notification = require('../models/Notification');
 const { triggerWebhook } = require('../utils/webhook'); // Outbound notification helper
 
 const router = express.Router();
@@ -350,6 +351,16 @@ router.post('/:id/collaborators', protect, async (req, res) => {
         username: userToAdd.username,
         role: role || 'viewer'
       });
+
+      // Notification: Notify the user they've been added as a collaborator
+      const newNotification = new Notification({
+        recipient: userToAdd._id,
+        actor: req.user._id,
+        type: 'join', // Using 'join' as a proxy for 'added to project' for now, or could add 'invite' type
+        graphId: graph._id,
+        graphTitle: graph.title
+      });
+      await newNotification.save().catch(console.error);
     }
 
     await graph.save();

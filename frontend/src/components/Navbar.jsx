@@ -4,14 +4,6 @@ import useThemeStore from '../store/themeStore';
 import { Network, LogOut, User, Zap, Globe, LayoutDashboard, Sun, Moon, Save, Menu, X, Trophy } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import UserBadge from './UserBadge';
-import { useState } from 'react';
-
-const DEMO_NOTIFICATIONS = [
-  { id: 1, type: 'vote', username: 'Alice', mapTitle: 'Q3 Revenue Drop', timeAgo: '2m ago' },
-  { id: 2, type: 'comment', username: 'Bob', mapTitle: 'Supply Chain Issue', timeAgo: '14m ago' },
-  { id: 3, type: 'join', username: 'Charlie', mapTitle: 'Q3 Revenue Drop', timeAgo: '1h ago' },
-];
-
 export default function Navbar() {
   const { isAuthenticated, user, logout, updatePreferences } = useAuthStore();
   const { isDarkMode, toggleTheme } = useThemeStore();
@@ -102,7 +94,7 @@ export default function Navbar() {
                   <span className="hidden sm:inline">Auto-Save</span>
                 </button>
                 <div className="h-6 w-px bg-border mx-1" />
-                <NotificationBell notifications={DEMO_NOTIFICATIONS} />
+                <NotificationBell />
                 <div className="h-6 w-px bg-border mx-1" />
                 <Link
                   to={`/profile/${user?._id}`}

@@ -12,6 +12,7 @@ const aiRoutes = require('./routes/ai');
 const folderRoutes = require('./routes/folder');
 const uploadRoutes = require('./routes/upload');
 const activityRoutes = require('./routes/activity');
+const notificationRoutes = require('./routes/notifications');
 const path = require('path');
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 const io = new Server(server, {
   cors: {

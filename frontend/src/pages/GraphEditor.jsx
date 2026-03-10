@@ -68,6 +68,7 @@ import { toPng } from 'html-to-image';
 import { useAuthStore } from '../store/authStore';
 import useThemeStore from '../store/themeStore';
 import toast from 'react-hot-toast';
+import { createNotification } from '../services/notifications';
 
 // Custom Nodes
 import ProblemNode from '../components/nodes/ProblemNode';
@@ -113,6 +114,7 @@ const GraphEditorInner = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [mapTitle, setMapTitle] = useState('Untitled Map');
+  const [graphCreatorId, setGraphCreatorId] = useState(null);
   const [lastSaved, setLastSaved] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -169,11 +171,22 @@ const GraphEditorInner = () => {
           useAuthStore.getState().awardXP(5);
         }
 
+        // Notification: Notify map creator about the vote
+        if (graphCreatorId && useAuthStore.getState().isAuthenticated && user?._id !== graphCreatorId) {
+          createNotification({
+            recipientId: graphCreatorId,
+            type: 'vote',
+            graphId: id,
+            graphTitle: mapTitle,
+            nodeId: nodeId
+          }).catch(console.error);
+        }
+
         return updatedNode;
       }
       return node;
     }));
-  }, [id, setNodes]);
+  }, [id, setNodes, graphCreatorId, mapTitle, user]);
 
   const deleteNode = useCallback((nodeId) => {
     setNodes(nds => nds.filter(node => node.id !== nodeId));
@@ -210,7 +223,18 @@ const GraphEditorInner = () => {
       return node;
     }));
     setHasUnsavedChanges(true);
-  }, [setNodes, user]);
+
+    // Notification: Notify map creator about the comment
+    if (graphCreatorId && useAuthStore.getState().isAuthenticated && user?._id !== graphCreatorId) {
+      createNotification({
+        recipientId: graphCreatorId,
+        type: 'comment',
+        graphId: id,
+        graphTitle: mapTitle,
+        nodeId: nodeId
+      }).catch(console.error);
+    }
+  }, [setNodes, user, graphCreatorId, id, mapTitle]);
 
   // FEATURE: Node Link Attachments
   const updateNodeLink = useCallback((nodeId, link) => {
@@ -645,6 +669,10 @@ const GraphEditorInner = () => {
 
       socketRef.current.on('presence_update', (users) => {
         setActiveUsers(users);
+        
+        // Notification: If I just joined, and I'm not the creator, notify the creator
+        // (This might trigger too often if not careful, but for a demo it's fine)
+        // Better: Only trigger once on successful fetchMap completion.
       });
       socketRef.current.on('cursor-move', ({ socketId, x, y }) => {
         setActiveUsers(prev => {
@@ -882,8 +910,9 @@ const GraphEditorInner = () => {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
         const { graph, nodes: fetchedNodes, edges: fetchedEdges } = response.data;
-        const { title, viewport, isPublic: graphIsPublic, scratchpadText: fetchedScratchpadText } = graph;
+        const { title, viewport, isPublic: graphIsPublic, scratchpadText: fetchedScratchpadText, creator } = graph;
         setMapTitle(title || 'Untitled Map');
+        setGraphCreatorId(creator?._id || creator);
         setIsPublic(graphIsPublic !== false);
         if (fetchedScratchpadText) setScratchpadText(fetchedScratchpadText);
 
@@ -909,6 +938,16 @@ const GraphEditorInner = () => {
 
         if (viewport) {
           setViewport(viewport, { duration: 800 });
+        }
+
+        // Notification: Notify creator that someone joined (if not the creator themselves)
+        if (creator?._id && useAuthStore.getState().isAuthenticated && user?._id !== (creator?._id || creator)) {
+          createNotification({
+            recipientId: creator?._id || creator,
+            type: 'join',
+            graphId: id,
+            graphTitle: title || 'Untitled Map'
+          }).catch(console.error);
         }
       } catch (error) {
         console.error('Error fetching map:', error);

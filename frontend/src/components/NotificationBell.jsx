@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, GitGraph, ThumbsUp, MessageSquare, UserPlus, Circle, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getNotifications, markAllRead } from '../services/notifications';
+import { formatDistanceToNow } from 'date-fns';
 
-// Demo activity data — in a real app this would be fetched from the API
 const ACTIVITY_TYPES = {
   vote: { icon: ThumbsUp, color: 'text-green-400', bg: 'bg-green-500/10', label: 'voted on' },
   comment: { icon: MessageSquare, color: 'text-brand-400', bg: 'bg-brand-500/10', label: 'commented on' },
@@ -10,12 +11,28 @@ const ACTIVITY_TYPES = {
   edit: { icon: GitGraph, color: 'text-orange-400', bg: 'bg-orange-500/10', label: 'edited' },
 };
 
-export default function NotificationBell({ notifications = [] }) {
+export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [readIds, setReadIds] = useState(new Set());
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const ref = useRef(null);
 
-  const unreadCount = notifications.filter(n => !readIds.has(n.id)).length;
+  const fetchNotifications = async () => {
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.isRead).length);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Optional: Set up polling or sockets for real-time updates here
+    // const intervalId = setInterval(fetchNotifications, 60000); 
+    // return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -25,11 +42,16 @@ export default function NotificationBell({ notifications = [] }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     setOpen(o => !o);
-    // Mark all as read when panel opens
-    if (!open) {
-      setReadIds(new Set(notifications.map(n => n.id)));
+    if (!open && unreadCount > 0) {
+      try {
+        await markAllRead();
+        setUnreadCount(0);
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      } catch (error) {
+        console.error('Failed to mark notifications as read:', error);
+      }
     }
   };
 
@@ -71,7 +93,8 @@ export default function NotificationBell({ notifications = [] }) {
               notifications.map(notif => {
                 const type = ACTIVITY_TYPES[notif.type] || ACTIVITY_TYPES.edit;
                 const Icon = type.icon;
-                const isUnread = !readIds.has(notif.id);
+                const isUnread = !notif.isRead;
+                const timeAgo = notif.timeAgo ? formatDistanceToNow(new Date(notif.timeAgo), { addSuffix: true }) : 'just now';
                 return (
                   <div
                     key={notif.id}
@@ -88,7 +111,7 @@ export default function NotificationBell({ notifications = [] }) {
                       </p>
                       <p className="text-[10px] text-text-muted mt-0.5 flex items-center gap-1">
                         {isUnread && <Circle size={5} className="fill-brand-400 text-brand-400" />}
-                        {notif.timeAgo}
+                        {timeAgo}
                       </p>
                     </div>
                   </div>
