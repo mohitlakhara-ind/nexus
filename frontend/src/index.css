@@ -1,0 +1,279 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Minimalist Professional Palette - Slate & Indigo focus */
+  --color-primary: #4f46e5;
+  /* Indigo 600 */
+  --color-secondary: #0ea5e9;
+  /* Sky 500 */
+  --color-accent: #10b981;
+  /* Emerald 500 */
+  --color-warning: #f59e0b;
+  /* Amber 500 */
+  --color-danger: #ef4444;
+  /* Red 500 */
+
+  --color-background: var(--bg-primary);
+  --color-surface: var(--bg-secondary);
+  --color-surface-elevated: var(--bg-tertiary);
+  --color-border: var(--border-color);
+  --color-main: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-glass: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+@layer base {
+  :root {
+    /* Premium Dark "Zinc Studio" Palette */
+    --bg-primary: #09090b;
+    /* Zinc 950 */
+    --bg-secondary: #18181b;
+    /* Zinc 900 */
+    --bg-tertiary: #27272a;
+    /* Zinc 800 */
+    --text-primary: #fafafa;
+    /* Zinc 50 */
+    --text-secondary: #a1a1aa;
+    /* Zinc 400 */
+    --border-color: #27272a;
+    /* Zinc 800 */
+    --glass-bg: rgba(24, 24, 27, 0.8);
+    --glass-border: rgba(63, 63, 70, 0.5);
+
+    /* React Flow Overrides */
+    --xy-node-background-color: var(--bg-secondary);
+    --xy-node-color: var(--text-primary);
+    --xy-node-border: 1px solid var(--border-color);
+    --xy-edge-stroke: var(--text-secondary);
+    --xy-edge-label-color: var(--text-primary);
+    --xy-connectionline-stroke: var(--text-secondary);
+    --xy-handle-background-color: var(--bg-tertiary);
+    --xy-handle-border-color: var(--border-color);
+    --xy-selection-background-color: rgba(79, 70, 229, 0.1);
+    /* Indigo */
+    --xy-selection-border-color: #4f46e5;
+    --xy-controls-button-background-color: var(--bg-secondary);
+    --xy-controls-button-background-color-hover: var(--bg-tertiary);
+    --xy-controls-button-border-color: var(--border-color);
+    --xy-controls-button-color: var(--text-primary);
+
+    /* Semantic Node Variables (Dark) - Professional Muted Tones */
+    --node-problem-bg: #451a1a;
+    --node-problem-border: #7f1d1d;
+    --node-problem-text: #fecaca;
+
+    --node-root-bg: #45291a;
+    --node-root-border: #78350f;
+    --node-root-text: #fde68a;
+
+    --node-solution-bg: #064e3b;
+    --node-solution-border: #065f46;
+    --node-solution-text: #a7f3d0;
+
+    --node-swot-bg: #312e81;
+    --node-swot-border: #4338ca;
+    --node-swot-text: #e0e7ff;
+
+    --node-primary-bg: #1e1b4b;
+    --node-primary-border: #3730a3;
+    --node-primary-text: #e0e7ff;
+
+    --node-decision-bg: #45291a;
+    --node-decision-border: #78350f;
+    --node-decision-text: #fde68a;
+
+    --node-action-bg: #064e3b;
+    --node-action-border: #065f46;
+    --node-action-text: #a7f3d0;
+
+    --node-note-bg: #424242;
+    --node-note-border: #525252;
+    --node-note-text: #e5e5e5;
+
+    --dot-color: #27272a;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Premium Light "Slate Canvas" Palette */
+  .light {
+    --bg-primary: #f8fafc;
+    /* Slate 50 */
+    --bg-secondary: #ffffff;
+    /* White */
+    --bg-tertiary: #f1f5f9;
+    /* Slate 100 */
+    --text-primary: #0f172a;
+    /* Slate 900 */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --border-color: #e2e8f0;
+    /* Slate 200 */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(226, 232, 240, 0.8);
+
+    /* React Flow Overrides */
+    --xy-node-background-color: var(--bg-secondary);
+    --xy-node-color: var(--text-primary);
+    --xy-node-border: 1px solid var(--border-color);
+    --xy-edge-stroke: var(--text-secondary);
+    --xy-edge-label-color: var(--text-primary);
+    --xy-connectionline-stroke: var(--text-secondary);
+    --xy-handle-background-color: var(--bg-secondary);
+    --xy-handle-border-color: var(--border-color);
+    --xy-selection-background-color: rgba(79, 70, 229, 0.05);
+    --xy-selection-border-color: #4f46e5;
+    --xy-controls-button-background-color: var(--bg-secondary);
+    --xy-controls-button-background-color-hover: var(--bg-tertiary);
+    --xy-controls-button-border-color: var(--border-color);
+    --xy-controls-button-color: var(--text-primary);
+
+    /* Semantic Node Variables (Light) - Soft Corporate Tones */
+    --node-problem-bg: #fee2e2;
+    /* Red 100 */
+    --node-problem-border: #f87171;
+    /* Red 400 */
+    --node-problem-text: #991b1b;
+    /* Red 800 */
+
+    --node-root-bg: #fef3c7;
+    /* Amber 100 */
+    --node-root-border: #fbbf24;
+    /* Amber 400 */
+    --node-root-text: #92400e;
+    /* Amber 800 */
+
+    --node-solution-bg: #d1fae5;
+    /* Emerald 100 */
+    --node-solution-border: #34d399;
+    /* Emerald 400 */
+    --node-solution-text: #065f46;
+    /* Emerald 800 */
+
+    --node-swot-bg: #e0e7ff;
+    /* Indigo 100 */
+    --node-swot-border: #818cf8;
+    /* Indigo 400 */
+    --node-swot-text: #3730a3;
+    /* Indigo 800 */
+
+    --node-primary-bg: #e0e7ff;
+    /* Indigo 100 */
+    --node-primary-border: #818cf8;
+    /* Indigo 400 */
+    --node-primary-text: #3730a3;
+    /* Indigo 800 */
+
+    --node-decision-bg: #fef3c7;
+    /* Amber 100 */
+    --node-decision-border: #fbbf24;
+    /* Amber 400 */
+    --node-decision-text: #92400e;
+    /* Amber 800 */
+
+    --node-action-bg: #d1fae5;
+    /* Emerald 100 */
+    --node-action-border: #34d399;
+    /* Emerald 400 */
+    --node-action-text: #065f46;
+    /* Emerald 800 */
+
+    --node-note-bg: #f1f5f9;
+    /* Slate 100 */
+    --node-note-border: #cbd5e1;
+    /* Slate 300 */
+    --node-note-text: #334155;
+    /* Slate 700 */
+
+    --dot-color: #e2e8f0;
+    /* Slate 200 */
+    --shadow-color: rgba(15, 23, 42, 0.08);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer utilities {
+  .dot-grid {
+    background-image: radial-gradient(circle, var(--dot-color) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+  }
+
+  .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 2px 4px -1px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  /* Replaced kinetic text with a subtle professional gradient text for accents only */
+  .gradient-text {
+    background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* React Flow Attribution Override */
+  .react-flow__panel.react-flow__attribution {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    opacity: 0.5;
+    font-weight: 400;
+  }
+
+  .react-flow__panel.react-flow__attribution a {
+    color: var(--text-secondary) !important;
+  }
+
+  .react-flow__panel.react-flow__attribution a:hover {
+    color: var(--text-primary) !important;
+  }
+
+  /* Micro-animations and professional hover states */
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+  }
+
+  /* Professional soft mesh replacement */
+  .mesh-bg {
+    background-color: var(--bg-primary);
+    background-image:
+      radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+  }
+}
