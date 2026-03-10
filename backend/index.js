@@ -23,6 +23,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://frontend-zeta-six-38.vercel.app',
+  'https://nexus-visuals.vercel.app',
   ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
 ];
 
