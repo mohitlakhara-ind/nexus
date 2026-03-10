@@ -308,7 +308,7 @@ router.post('/layout', async (req, res) => {
     const { nodes, edges } = req.body;
     if (!nodes || nodes.length === 0) return res.status(400).json({ message: 'No nodes provided.' });
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const nodeDescriptions = nodes.map(n => `ID: ${n.id}, Label: "${n.data?.label || 'Untitled'}", Type: ${n.type}`).join('\n');
     const edgeDescriptions = (edges || []).map(e => `${e.source} -> ${e.target}`).join('\n');
