@@ -13,7 +13,7 @@ import OnboardingTour from '../components/OnboardingTour';
 import UserBadge from '../components/UserBadge';
 import useDebounce from '../hooks/useDebounce';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com'}/api`;
 
 const TEMPLATES = [
   {

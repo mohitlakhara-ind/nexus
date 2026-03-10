@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import BadgeShowcase from '../components/BadgeShowcase';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com'}/api`;
 
 export default function Profile() {
   const { id } = useParams();

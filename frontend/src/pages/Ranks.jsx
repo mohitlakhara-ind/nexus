@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com';
 
 const RANK_TIERS = [
     { name: 'Bronze', minLevel: 1, color: '#cd7f32', glow: 'rgba(205,127,50,0.3)', icon: Medal },

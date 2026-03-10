@@ -32,6 +32,14 @@ function App() {
   useEffect(() => {
     initTheme();
     fetchCurrentUser();
+
+    // Ping backend every 10 minutes to keep Render free tier awake
+    const interval = setInterval(() => {
+      fetch(import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com')
+        .catch(() => {});
+    }, 10 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, [fetchCurrentUser, initTheme]);
 
   if (loading) {

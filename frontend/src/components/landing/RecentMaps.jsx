@@ -3,7 +3,7 @@ import { Network, Search, ArrowRight, Calendar, Globe, User, Sparkles } from 'lu
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com'}/api`;
 
 export default function RecentMaps() {
   const [graphs, setGraphs] = useState([]);

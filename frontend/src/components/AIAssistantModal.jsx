@@ -3,7 +3,7 @@ import { Bot, X, Send, Sparkles, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com'}/api`;
 
 export default function AIAssistantModal({ isOpen, onClose, nodes, edges, onApplySuggestions, onWorkingStateChange }) {
   const [messages, setMessages] = useState([

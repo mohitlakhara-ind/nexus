@@ -103,8 +103,8 @@ const nodeTypes = {
 const initialNodes = [];
 const initialEdges = [];
 
-const API_BASE_URL = 'http://localhost:5000/api';
-const SOCKET_URL = 'http://localhost:5000';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com'}/api`;
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com';
 
 const GraphEditorInner = () => {
   const { id } = useParams();
