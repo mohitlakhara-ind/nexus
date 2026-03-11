@@ -61,7 +61,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-3 bg-main/5 border border-border rounded-full pl-2 pr-5 py-1.5 mb-10 hover:border-primary/20 transition-all cursor-default group backdrop-blur-sm">
               <div className="bg-primary/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-primary">v4.0</div>
               <span className="text-xs font-bold font-display uppercase tracking-widest text-muted group-hover:text-main transition-colors">Visual Intelligence Engine</span>
-              <ShieldCheck size={14} className="text-primary animate-pulse" />
+              <Sparkles size={14} className="text-primary animate-pulse" />
             </div>
 
             <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black tracking-tighter mb-8 leading-[0.85] text-main uppercase italic text-balance">
@@ -94,7 +94,7 @@ export default function Home() {
                 onClick={() => document.getElementById('vision')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto px-12 py-6 glass-panel hover:bg-main/5 border-border rounded-full font-display font-bold text-main transition-all flex items-center justify-center gap-3 group"
               >
-                <Lock size={20} className="text-muted group-hover:text-main transition-colors" />
+                <Layout size={20} className="text-muted group-hover:text-main transition-colors" />
                 <span>HOW IT WORKS</span>
               </button>
             </div>
@@ -132,8 +132,8 @@ export default function Home() {
 
               <div className="space-y-8">
                 <div className="flex gap-6">
-                  <div className="size-20 rounded-3xl bg-main/5 border border-border flex items-center justify-center mx-auto mb-8 shadow-inner group">
-                    <Logo className="size-10 text-secondary" />
+                  <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                    <Target size={24} className="text-primary" />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-main mb-2">Infinite Clarity</h4>
@@ -142,7 +142,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-6">
                   <div className="size-12 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/20 shrink-0">
-                    <Mail size={24} className="text-secondary" />
+                    <Users size={24} className="text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-main mb-2">Syncronized Mind</h4>
