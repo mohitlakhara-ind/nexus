@@ -1,78 +1,96 @@
-# Nexus - Visual Mind Mapping & Diagramming
+# 🌌 Nexus - Visual Mind Mapping & Intelligent Diagramming
 
-Nexus is a full-stack, collaborative mind-mapping and diagram-creation tool built for thinkers, planners, and teams. Map out your thoughts, analyze root causes, or design system architectures with an infinite canvas and real-time multiplayer support.
+> Nexus is a premium, full-stack collaborative platform designed to transform complex thoughts into structured visual intelligence. Build, analyze, and scale your ideas on an infinite canvas with real-time multiplayer support.
 
-![Nexus Dashboard Demo](./assets/demo.png) *(Placeholder for screenshot)*
+[![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://nexus-delta.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-## Features
+---
 
-- 🧠 **Infinite Canvas:** Built on top of React Flow, allowing for limitless node-based diagrams.
-- 👥 **Real-Time Collaboration:** Powered by Socket.io. See cursors move and nodes update instantly as your team works together.
-- 🗃️ **Specialized Nodes:** Beyond basic shapes, Nexus includes tailored nodes for SWOT analyses, 5 Whys, and actionable Decision Trees.
-- 🎨 **Theming & Gamification:** Light/Dark modes, beautifully crafted UI with Tailwind CSS, and user leveling (XP) for engagements!
-- ⌨️ **Keyboard First:** Complete Command Palette (Ctrl+K) and Markdown import pasting for power users.
+## ✨ Core Features
 
-## Tech Stack
+| Feature | Description |
+| :--- | :--- |
+| 🧠 **Infinite Canvas** | Powered by **React Flow**, providing a limitless workspace for node-based architecture. |
+| 👥 **Real-Time Sync** | **Socket.io** integration allows seamless collaboration with live cursor tracking. |
+| 🛠️ **Semantic Nodes** | Specialized nodes for **SWOT**, **5 Whys**, and custom decision trees. |
+| 🌓 **Premium UI** | Implementation of **Tailwind CSS v4** & **Framer Motion** for a sleek, glassmorphic look. |
+| ⌨️ **Power User Tools** | Full **Command Palette (Ctrl+K)** and Markdown-to-Canvas pasting. |
+| 🎮 **Gamified Flow** | Integrated XP system and user leveling to encourage deep work. |
 
-**Frontend:**
-- React 19 (Vite)
-- React Flow (Node/Canvas Engine)
-- Tailwind CSS v4 & Framer Motion (Styling & Animation)
-- Zustand (State Management)
-- Socket.io Client
+---
 
-**Backend:**
-- Node.js & Express
-- MongoDB & Mongoose (Data Storage)
-- JWT (Authentication)
-- Socket.io (WebSocket Server)
+## 🚀 Tech Stack
 
-## Running Locally
+### Frontend
+- **Framework:** React 19 (Vite)
+- **Engine:** React Flow v12 (Canvas manipulation)
+- **Styling:** Tailwind CSS v4 + Framer Motion (Animations)
+- **State:** Zustand (Atomic state management)
+- **Real-time:** Socket.io-client
 
-To run Nexus on your local machine, you will need Node.js and a MongoDB instance (local or Atlas) running.
+### Backend
+- **Runtime:** Node.js (Express 5)
+- **Database:** MongoDB (Mongoose ODM)
+- **Auth:** JWT (JSON Web Tokens)
+- **Intelligence:** Google Gemini AI integration
 
-### 1. Clone & Setup
+---
 
+## 🛠️ Local Development
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+)
+- [MongoDB](https://www.mongodb.com/) (Local or Atlas)
+
+### 1. Setup Repository
 ```bash
 git clone https://github.com/yourusername/nexus.git
 cd nexus
 ```
 
 ### 2. Backend Configuration
-Navigate to the frontend directory and install dependencies:
 ```bash
 cd backend
 npm install
 ```
-
-Create a `.env` file in the `backend/` root:
+Create `.env` in `backend/`:
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/nexus
-JWT_SECRET=your_super_secret_jwt_key
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+GEMINI_API_KEY=your_gemini_key
 ```
-
-Start the backend:
 ```bash
-npm run dev
+npm start
 ```
 
 ### 3. Frontend Configuration
-In a new terminal window, navigate to the frontend directory:
 ```bash
-cd frontend
+cd ../frontend
 npm install
-```
-
-Start the Vite development server:
-```bash
 npm run dev
 ```
 
-Nexus should now be running at `http://localhost:5173`.
+---
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request for any bugs or feature enhancements.
+## 🗺️ Roadmap
 
-## License
-MIT
+- [x] **Phase 1:** Core Canvas & Basic Nodes
+- [x] **Phase 2:** Real-time Collaboration (WebSockets)
+- [x] **Phase 3:** AI-Powered Node Generation
+- [/] **Phase 4:** Workspace Organization & Templates
+- [ ] **Phase 5:** Mobile Responsive View & Exporting
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) and [Architecture Documentation](ARCHITECTURE.md) to get started.
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+*Created with ❤️ by the Nexus Team.*
