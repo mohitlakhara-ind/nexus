@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import useThemeStore from '../store/themeStore';
-import { Network, LogOut, User, Zap, Globe, LayoutDashboard, Sun, Moon, Save, Menu, X, Trophy } from 'lucide-react';
+import { Network, LogOut, User, Globe, LayoutDashboard, Sun, Moon, Save, Menu, X, Trophy } from 'lucide-react';
+import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 import UserBadge from './UserBadge';
 export default function Navbar() {
@@ -33,9 +34,7 @@ export default function Navbar() {
         <div className="flex justify-between h-full items-center">
           <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="size-9 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-all shadow-md">
-                <Network className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-              </div>
+              <Logo className="size-8 text-primary fill-primary/20" />
               <div className="flex flex-col">
                 <span className="text-lg font-display font-extrabold tracking-tighter text-main leading-none">
                   NEXUS

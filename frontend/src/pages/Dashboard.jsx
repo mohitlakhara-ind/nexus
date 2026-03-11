@@ -3,9 +3,10 @@ import { useAuthStore } from '../store/authStore';
 import {
   Plus, Search, GitGraph, FileText, Layers, Globe, Clock,
   ArrowRight, Sparkles, Users, BarChart3, TrendingUp, X, ChevronRight,
-  Network, Target, Folder as FolderIcon, FolderPlus, Settings, Zap,
+  Network, Target, Folder as FolderIcon, FolderPlus, Settings,
   Activity, Bell, PieChart, MoreVertical, Copy, Trash2
 } from 'lucide-react';
+import Logo from '../components/Logo';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -188,7 +189,7 @@ function ActivityItem({ title, time, type }) {
     <div className="flex gap-4 p-3 rounded-xl hover:bg-main/5 transition-colors border border-transparent hover:border-border group">
       <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${type === 'create' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
         }`}>
-        {type === 'create' ? <Plus size={14} /> : <Zap size={14} />}
+        {type === 'create' ? <Plus size={14} /> : <Logo className="size-3.5" />}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-bold text-main truncate">{title}</p>
@@ -734,7 +735,6 @@ export default function Dashboard() {
           ))}
         </div>
       )}
- )}
           </div>
         </div>
 

@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useScroll, useTransform, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Network, ArrowRight, Zap, Target, Brain, Share2, ShieldCheck, Sparkles, Layout, Users } from 'lucide-react';
+import Logo from '../components/Logo';
 import { useAuthStore } from '../store/authStore';
 
 import FeaturesShowcase from '../components/landing/FeaturesShowcase';
@@ -60,7 +61,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-3 bg-main/5 border border-border rounded-full pl-2 pr-5 py-1.5 mb-10 hover:border-primary/20 transition-all cursor-default group backdrop-blur-sm">
               <div className="bg-primary/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-primary">v4.0</div>
               <span className="text-xs font-bold font-display uppercase tracking-widest text-muted group-hover:text-main transition-colors">Visual Intelligence Engine</span>
-              <Sparkles size={14} className="text-primary animate-pulse" />
+              <ShieldCheck size={14} className="text-primary animate-pulse" />
             </div>
 
             <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black tracking-tighter mb-8 leading-[0.85] text-main uppercase italic text-balance">
@@ -93,7 +94,7 @@ export default function Home() {
                 onClick={() => document.getElementById('vision')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto px-12 py-6 glass-panel hover:bg-main/5 border-border rounded-full font-display font-bold text-main transition-all flex items-center justify-center gap-3 group"
               >
-                <Layout size={20} className="text-muted group-hover:text-main transition-colors" />
+                <Lock size={20} className="text-muted group-hover:text-main transition-colors" />
                 <span>HOW IT WORKS</span>
               </button>
             </div>
@@ -115,10 +116,24 @@ export default function Home() {
               <h2 className="text-4xl md:text-6xl font-display font-black text-main mt-6 mb-10 uppercase leading-[0.9] italic">
                 Complexity is <br /><span className="text-primary">Beautifully Simple.</span>
               </h2>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-4 mb-2"
+              >
+                <div className="size-16 rounded-[24px] bg-primary/20 backdrop-blur-xl border border-primary/30 flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Logo className="size-10 text-primary" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-black uppercase tracking-[0.4em] text-primary">Nexus Engine</span>
+                  <span className="text-[10px] font-bold text-muted uppercase tracking-widest mt-0.5">v2.4.0 Stable</span>
+                </div>
+              </motion.div>
+
               <div className="space-y-8">
                 <div className="flex gap-6">
-                  <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-                    <Target size={24} className="text-primary" />
+                  <div className="size-20 rounded-3xl bg-main/5 border border-border flex items-center justify-center mx-auto mb-8 shadow-inner group">
+                    <Logo className="size-10 text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-main mb-2">Infinite Clarity</h4>
@@ -127,7 +142,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-6">
                   <div className="size-12 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/20 shrink-0">
-                    <Users size={24} className="text-secondary" />
+                    <Mail size={24} className="text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-main mb-2">Syncronized Mind</h4>

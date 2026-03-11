@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Network, ArrowRight, ShieldCheck, Mail, Lock, User, Zap } from 'lucide-react';
+import { Network, ArrowRight, ShieldCheck, Mail, Lock, User } from 'lucide-react';
+import Logo from '../components/Logo';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -30,7 +31,7 @@ export default function Register() {
           
           <div className="text-center mb-10">
             <div className="size-20 rounded-3xl bg-main/5 border border-border flex items-center justify-center mx-auto mb-8 shadow-inner group">
-              <User size={32} className="text-secondary fill-secondary/20 group-hover:scale-110 transition-transform" />
+              <Logo className="size-10 text-secondary" />
             </div>
             <h1 className="text-3xl font-display font-black text-main mb-3 uppercase italic tracking-tight">Join Nexus</h1>
             <p className="text-muted font-medium uppercase tracking-[0.2em] text-[10px]">Create Your Account</p>
