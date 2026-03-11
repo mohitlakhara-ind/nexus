@@ -1653,7 +1653,7 @@ const GraphEditorInner = () => {
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
-                      <Zap size={24} className="text-primary" />
+                      <Logo className="size-6 text-primary" />
                     </div>
                     <div>
                       <h2 className="text-xl font-display font-bold text-main">Keyboard Shortcuts</h2>
@@ -1720,7 +1720,7 @@ const GraphEditorInner = () => {
 
               <div className="bg-main/30 backdrop-blur-md rounded-3xl p-1.5 sm:p-2 flex items-center shadow-2xl border border-border overflow-x-auto max-w-full scrollbar-hide shrink-0">
                 <div className="flex items-center gap-1.5 px-3 py-2 bg-main/20 rounded-2xl border border-border mr-1 sm:mr-2 shrink-0">
-                  <Zap size={14} className="text-main" />
+                  <Logo className="size-4 text-main" />
                   {/* Hide text on very small screens, keep icon */}
                   <span className="hidden sm:inline text-[10px] uppercase font-display font-bold tracking-widest text-main">Add Element</span>
                 </div>
