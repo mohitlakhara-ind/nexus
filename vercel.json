@@ -11,11 +11,48 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/frontend/assets/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/frontend/favicon.ico"
+    },
+    {
+      "src": "/vite.svg",
+      "dest": "/frontend/vite.svg"
+    },
+    {
+      "src": "/manifest.webmanifest",
+      "dest": "/frontend/manifest.webmanifest"
+    },
+    {
+      "src": "/site.webmanifest",
+      "dest": "/frontend/site.webmanifest"
+    },
+    {
+      "src": "/pwa-192x192.png",
+      "dest": "/frontend/pwa-192x192.png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "dest": "/frontend/pwa-512x512.png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "dest": "/frontend/apple-touch-icon.png"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/frontend/sw.js"
+    },
+    {
+      "src": "/workbox-([a-z0-9]+).js",
+      "dest": "/frontend/workbox-$1.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/frontend/index.html"
     }
   ]
 }
