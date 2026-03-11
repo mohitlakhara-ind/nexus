@@ -49,21 +49,21 @@ export default function Navbar() {
               <div className="hidden md:flex items-center gap-1">
                 <Link
                   to="/dashboard"
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isActive('/dashboard') ? 'text-primary bg-primary/10' : 'text-muted hover:text-main hover:bg-main/5'
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${isActive('/dashboard') ? 'text-primary bg-primary/10' : 'text-muted hover:text-main hover:bg-main/5'
                     }`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/discover"
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isActive('/discover') ? 'text-secondary bg-secondary/10' : 'text-muted hover:text-main hover:bg-main/5'
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${isActive('/discover') ? 'text-secondary bg-secondary/10' : 'text-muted hover:text-main hover:bg-main/5'
                     }`}
                 >
                   Discover
                 </Link>
                 <Link
                   to="/ranks"
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isActive('/ranks') ? 'text-warning bg-warning/10' : 'text-muted hover:text-main hover:bg-main/5'
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${isActive('/ranks') ? 'text-warning bg-warning/10' : 'text-muted hover:text-main hover:bg-main/5'
                     }`}
                 >
                   Ranks

@@ -224,7 +224,7 @@ function SidebarContent({
           <button
             key={id}
             onClick={() => handleAction(() => setFilter(id))}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-display font-bold transition-all ${filter === id
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-display font-bold transition-all ${filter === id
               ? 'bg-primary/10 text-primary border border-primary/20'
               : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
               }`}
@@ -251,7 +251,7 @@ function SidebarContent({
                 <button
                   key={f._id}
                   onClick={() => handleAction(() => setFilter(f._id))}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all group ${filter === f._id ? 'bg-secondary/10 text-secondary border border-secondary/20' : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all group ${filter === f._id ? 'bg-secondary/10 text-secondary border border-secondary/20' : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
                     }`}
                 >
                   <FolderIcon size={14} className={f.color || 'text-secondary'} />
@@ -273,7 +273,7 @@ function SidebarContent({
               <button
                 key={t.id}
                 onClick={() => handleAction(() => { setSelectedTemplate(t.id); setIsModalOpen(true); })}
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-muted/60 hover:bg-main/5 hover:text-muted transition-all border border-transparent"
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-muted/60 hover:bg-main/5 hover:text-muted transition-all border border-transparent"
               >
                 <Icon size={14} className={t.color} />
                 {t.title}
@@ -306,7 +306,7 @@ function SidebarContent({
             <Link
               to={`/profile/${user._id}`}
               onClick={onInteraction}
-              className="w-full text-center py-2.5 bg-background/50 hover:bg-main/10 rounded-xl text-[10px] font-black font-display uppercase tracking-[0.2em] text-muted hover:text-main transition-all mt-2 border border-border/50 hover:border-border"
+              className="w-full text-center py-2.5 bg-background/50 hover:bg-main/10 rounded-xl text-xs font-black font-display uppercase tracking-[0.2em] text-muted hover:text-main transition-all mt-2 border border-border/50 hover:border-border"
             >
               Access Profile
             </Link>
