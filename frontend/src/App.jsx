@@ -4,7 +4,6 @@ import { useAuthStore } from './store/authStore';
 import useThemeStore from './store/themeStore';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
-
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -36,7 +35,7 @@ function App() {
     // Ping backend every 10 minutes to keep Render free tier awake
     const interval = setInterval(() => {
       fetch(import.meta.env.VITE_API_URL || 'https://nexus-p2eh.onrender.com')
-        .catch(() => {});
+        .catch(() => { });
     }, 10 * 60 * 1000);
 
     return () => clearInterval(interval);
