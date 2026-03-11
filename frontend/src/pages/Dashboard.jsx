@@ -4,7 +4,7 @@ import {
   Plus, Search, GitGraph, FileText, Layers, Globe, Clock,
   ArrowRight, Sparkles, Users, BarChart3, TrendingUp, X, ChevronRight,
   Network, Target, Folder as FolderIcon, FolderPlus, Settings,
-  Activity, Bell, PieChart, MoreVertical, Copy, Trash2
+  Activity, Bell, PieChart, MoreVertical, Copy, Trash2, Zap
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import { useNavigate, Link } from 'react-router-dom';
