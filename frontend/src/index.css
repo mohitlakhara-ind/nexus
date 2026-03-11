@@ -228,10 +228,24 @@
 
   /* Replaced kinetic text with a subtle professional gradient text for accents only */
   .gradient-text {
-    background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+    background: linear-gradient(135deg, #4f46e5, #0ea5e9, #818cf8);
+    background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+  }
+
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 md:px-12 lg:px-16;
   }
 
   .scrollbar-hide::-webkit-scrollbar {

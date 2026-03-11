@@ -1512,11 +1512,12 @@ const GraphEditorInner = () => {
               </button>
               <button
                 onClick={() => setSpotlightMode(!spotlightMode)}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all hidden md:block ${spotlightMode ? 'bg-warning text-background shadow-lg' : 'hover:bg-main/5 text-muted hover:text-main'}`}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all hidden lg:block ${spotlightMode ? 'bg-warning text-background shadow-lg' : 'hover:bg-main/5 text-muted hover:text-main'}`}
                 title="Spotlight Mode"
               >
                 <Flashlight size={18} />
               </button>
+
               <div className="h-6 w-px bg-border mx-1 hidden md:block" />
               <button
                 onClick={togglePresentationMode}
@@ -1528,11 +1529,12 @@ const GraphEditorInner = () => {
               <div className="h-6 w-px bg-border mx-1 hidden md:block" />
               <button
                 onClick={() => setFocusMode(!focusMode)}
-                className={`p-2 sm:p-2.5 rounded-xl transition-all hidden md:block ${focusMode ? 'bg-main text-background shadow-lg' : 'hover:bg-main/5 text-muted hover:text-main'}`}
+                className={`p-2 sm:p-2.5 rounded-xl transition-all hidden lg:block ${focusMode ? 'bg-main text-background shadow-lg' : 'hover:bg-main/5 text-muted hover:text-main'}`}
                 title="Focus Mode"
               >
                 {focusMode ? <Eye size={18} /> : <EyeOff size={18} />}
               </button>
+
               <div className="h-6 w-px bg-border mx-1 hidden md:block" />
               <button
                 onClick={cycleEdgeType}
@@ -1850,8 +1852,9 @@ const GraphEditorInner = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-panel rounded-[40px] p-12 text-center w-[420px] border-border shadow-md flex flex-col items-center pointer-events-auto"
+            className="glass-panel rounded-[32px] sm:rounded-[40px] p-8 sm:p-12 text-center w-[90vw] max-w-[420px] border-border shadow-md flex flex-col items-center pointer-events-auto"
           >
+
             <div className={`size-20 rounded-[28px] flex items-center justify-center mb-8 border transition-transform hover:-translate-y-1 ${isDarkMode
               ? 'bg-secondary/15 border-secondary/30 shadow-lg shadow-secondary/20'
               : 'bg-secondary/10 border-secondary/25 shadow-md shadow-secondary/10'
@@ -1899,7 +1902,8 @@ const GraphEditorInner = () => {
       />
 
       {/* Side Panels - Unified Sidebar */}
-      <div className={`fixed inset-y-0 right-0 w-[380px] bg-main/30 backdrop-blur-md shadow-2xl border-l border-border z-50 transform transition-transform duration-500 overflow-hidden flex flex-col ${activePanel ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed inset-y-0 right-0 w-full sm:w-[380px] bg-main/30 backdrop-blur-md shadow-2xl border-l border-border z-[100] transform transition-transform duration-500 overflow-hidden flex flex-col ${activePanel ? 'translate-x-0' : 'translate-x-full'}`}>
+
 
         {/* AI Panel Content */}
         {activePanel === 'ai' && (

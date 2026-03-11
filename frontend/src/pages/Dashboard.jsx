@@ -7,7 +7,7 @@ import {
   Activity, Bell, PieChart, MoreVertical, Copy, Trash2
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import OnboardingTour from '../components/OnboardingTour';
 import UserBadge from '../components/UserBadge';
@@ -190,11 +190,151 @@ function ActivityItem({ title, time, type }) {
         }`}>
         {type === 'create' ? <Plus size={14} /> : <Zap size={14} />}
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-xs font-bold text-main truncate">{title}</p>
         <p className="text-[10px] text-muted font-medium uppercase tracking-widest mt-0.5">{time}</p>
       </div>
     </div>
+  );
+}
+
+function SidebarContent({
+  filter,
+  setFilter,
+  token,
+  folders,
+  setIsFolderModalOpen,
+  activities,
+  setSelectedTemplate,
+  setIsModalOpen,
+  user,
+  onInteraction
+}) {
+  const handleAction = (cb) => {
+    cb();
+    if (onInteraction) onInteraction();
+  };
+
+  return (
+    <>
+      <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold mb-6 px-2">QUICK LINKS</p>
+      <nav className="space-y-2 mb-10">
+        {SIDEBAR_LINKS.map(({ label, id, icon: LinkIcon }) => (
+          <button
+            key={id}
+            onClick={() => handleAction(() => setFilter(id))}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-display font-bold transition-all ${filter === id
+              ? 'bg-primary/10 text-primary border border-primary/20'
+              : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
+              }`}
+          >
+            <LinkIcon size={18} />
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      {token && (
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold">FOLDERS</p>
+            <button onClick={() => handleAction(() => setIsFolderModalOpen(true))} className="text-primary hover:text-secondary transition-colors p-1" title="New Folder">
+              <FolderPlus size={16} />
+            </button>
+          </div>
+          <div className="space-y-1">
+            {folders.length === 0 ? (
+              <p className="text-[10px] text-muted/60 px-2 italic uppercase tracking-widest">No folders</p>
+            ) : (
+              folders.map(f => (
+                <button
+                  key={f._id}
+                  onClick={() => handleAction(() => setFilter(f._id))}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all group ${filter === f._id ? 'bg-secondary/10 text-secondary border border-secondary/20' : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
+                    }`}
+                >
+                  <FolderIcon size={14} className={f.color || 'text-secondary'} />
+                  <span className="truncate">{f.name}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="mb-8">
+        <p className="text-[10px] text-muted font-bold uppercase tracking-[0.2em] mb-4 px-2">Community Activity</p>
+        <div className="space-y-4 px-2">
+          {activities.length === 0 ? (
+            <p className="text-[10px] text-muted font-bold uppercase tracking-widest italic opacity-50 px-1">No Recent Waves</p>
+          ) : (
+            activities.map((act, i) => (
+              <div key={i} className="flex gap-3 items-start group">
+                <div className={`mt-1.5 size-1.5 rounded-full shrink-0 shadow-[0_0_8px_currentColor] ${act.type === 'new_map' ? 'text-primary' : 'text-secondary'}`} />
+                <div className="flex flex-col">
+                  <p className="text-[11px] text-main font-bold leading-tight group-hover:text-primary transition-colors cursor-default">
+                    <span className="opacity-70">{act.user}</span>
+                    {act.type === 'new_map' ? ' mapped ' : ' trending: '}
+                    <span className="italic">{act.title}</span>
+                  </p>
+                  <p className="text-[9px] uppercase tracking-widest font-bold text-muted mt-1 opacity-50">
+                    {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="mb-10">
+        <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold mb-4 px-2">TEMPLATES</p>
+        <div className="space-y-1">
+          {TEMPLATES.map(t => {
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.id}
+                onClick={() => handleAction(() => { setSelectedTemplate(t.id); setIsModalOpen(true); })}
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-muted/60 hover:bg-main/5 hover:text-muted transition-all border border-transparent"
+              >
+                <Icon size={14} className={t.color} />
+                {t.title}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {user && (
+        <div className="mt-auto flex flex-col gap-3 p-4 rounded-2xl bg-main/5 border border-border group relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+          <div className="flex items-center gap-4 relative z-10">
+            <UserBadge level={user.level || 1} size="lg" showLabel={false} />
+            <div className="overflow-hidden flex-grow">
+              <p className="text-lg font-display font-extrabold text-main truncate tracking-tight">{user.username}</p>
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-primary">Lv. {user.level || 1}</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-muted">{user.xp || 0} XP</p>
+              </div>
+              <div className="w-full h-1.5 bg-background rounded-full mt-2 overflow-hidden border border-border">
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-1000"
+                  style={{ width: `${((user.xp || 0) % 50) / 50 * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
+          <Link
+            to={`/profile/${user._id}`}
+            onClick={onInteraction}
+            className="w-full text-center py-2 bg-background/50 hover:bg-main/10 rounded-xl text-xs font-bold font-display uppercase tracking-widest text-muted hover:text-main transition-colors mt-2"
+          >
+            View Profile
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -216,7 +356,9 @@ export default function Dashboard() {
   const [selectedFolder, setSelectedFolder] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('blank');
   const [creating, setCreating] = useState(false);
-  const [sortBy, setSortBy] = useState('newest'); // newest, oldest, most-nodes
+  const [sortBy, setSortBy] = useState('newest');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+ // newest, oldest, most-nodes
 
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -404,130 +546,64 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar - Simplified */}
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 fixed top-16 left-0 h-[calc(100vh-4rem)] glass-panel border-r border-border px-6 py-8 overflow-y-auto scrollbar-hide">
-        <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold mb-6 px-2">QUICK LINKS</p>
-        <nav className="space-y-2 mb-10">
-          {SIDEBAR_LINKS.map(({ label, id, icon: LinkIcon }) => (
-            <button
-              key={id}
-              onClick={() => setFilter(id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-display font-bold transition-all ${filter === id
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
-                }`}
-            >
-              <LinkIcon size={18} />
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        {token && (
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-4 px-2">
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold">FOLDERS</p>
-              <button onClick={() => setIsFolderModalOpen(true)} className="text-primary hover:text-secondary transition-colors p-1" title="New Folder">
-                <FolderPlus size={16} />
-              </button>
-            </div>
-            <div className="space-y-1">
-              {folders.length === 0 ? (
-                <p className="text-[10px] text-muted/60 px-2 italic uppercase tracking-widest">No folders</p>
-              ) : (
-                folders.map(f => (
-                  <button
-                    key={f._id}
-                    onClick={() => setFilter(f._id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all group ${filter === f._id ? 'bg-secondary/10 text-secondary border border-secondary/20' : 'text-muted hover:bg-main/5 hover:text-main border border-transparent'
-                      }`}
-                  >
-                    <FolderIcon size={14} className={f.color || 'text-secondary'} />
-                    <span className="truncate">{f.name}</span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        <div className="mb-8">
-          <p className="text-[10px] text-muted font-bold uppercase tracking-[0.2em] mb-4 px-2">Community Activity</p>
-          <div className="space-y-4 px-2">
-            {activities.length === 0 ? (
-              <p className="text-[10px] text-muted font-bold uppercase tracking-widest italic opacity-50 px-1">No Recent Waves</p>
-            ) : (
-              activities.map((act, i) => (
-                <div key={i} className="flex gap-3 items-start group">
-                  <div className={`mt-1.5 size-1.5 rounded-full shrink-0 shadow-[0_0_8px_currentColor] ${act.type === 'new_map' ? 'text-primary' : 'text-secondary'}`} />
-                  <div className="flex flex-col">
-                    <p className="text-[11px] text-main font-bold leading-tight group-hover:text-primary transition-colors cursor-default">
-                      <span className="opacity-70">{act.user}</span>
-                      {act.type === 'new_map' ? ' mapped ' : ' trending: '}
-                      <span className="italic">{act.title}</span>
-                    </p>
-                    <p className="text-[9px] uppercase tracking-widest font-bold text-muted mt-1 opacity-50">
-                      {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="mb-10">
-          <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold mb-4 px-2">TEMPLATES</p>
-          <div className="space-y-1">
-            {TEMPLATES.map(t => {
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => { setSelectedTemplate(t.id); setIsModalOpen(true); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-muted/60 hover:bg-main/5 hover:text-muted transition-all border border-transparent"
-                >
-                  <Icon size={14} className={t.color} />
-                  {t.title}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {user && (
-          <div className="mt-auto flex flex-col gap-3 p-4 rounded-2xl bg-main/5 border border-border group relative overflow-hidden">
-            {/* Background Glow based on level */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-
-            <div className="flex items-center gap-4 relative z-10">
-              <UserBadge level={user.level || 1} size="lg" showLabel={false} />
-
-              <div className="overflow-hidden flex-grow">
-                <p className="text-lg font-display font-extrabold text-main truncate tracking-tight">{user.username}</p>
-                <div className="flex justify-between items-center mt-1">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-primary">Lv. {user.level || 1}</p>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-muted">{user.xp || 0} XP</p>
-                </div>
-                {/* Progress bar to next level */}
-                <div className="w-full h-1.5 bg-background rounded-full mt-2 overflow-hidden border border-border">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{ width: `${((user.xp || 0) % 50) / 50 * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Link
-              to={`/profile/${user._id}`}
-              className="w-full text-center py-2 bg-background/50 hover:bg-main/10 rounded-xl text-xs font-bold font-display uppercase tracking-widest text-muted hover:text-main transition-colors mt-2"
-            >
-              View Profile
-            </Link>
-          </div>
-        )}
+        <SidebarContent
+          filter={filter}
+          setFilter={setFilter}
+          token={token}
+          folders={folders}
+          setIsFolderModalOpen={setIsFolderModalOpen}
+          activities={activities}
+          setSelectedTemplate={setSelectedTemplate}
+          setIsModalOpen={setIsModalOpen}
+          user={user}
+        />
       </aside>
+
+      {/* Mobile Sidebar Modal */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-md z-[180]"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="lg:hidden fixed top-0 left-0 h-full w-[300px] bg-background border-r border-border shadow-2xl z-[190] overflow-y-auto scrollbar-hide flex flex-col pt-16"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-xs font-black uppercase tracking-[0.3em] text-muted">Workspace Tools</span>
+                  <button onClick={() => setIsSidebarOpen(false)} className="p-2 rounded-xl hover:bg-main/5 text-muted">
+                    <X size={20} />
+                  </button>
+                </div>
+                <SidebarContent
+                  filter={filter}
+                  setFilter={setFilter}
+                  token={token}
+                  folders={folders}
+                  setIsFolderModalOpen={setIsFolderModalOpen}
+                  activities={activities}
+                  setSelectedTemplate={setSelectedTemplate}
+                  setIsModalOpen={setIsModalOpen}
+                  user={user}
+                  onInteraction={() => setIsSidebarOpen(false)}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
 
       {/* Main Content - Expanded with Activity Feed */}
       <main className="flex-grow lg:pl-64 pr-0 flex min-h-screen">
@@ -580,86 +656,85 @@ export default function Dashboard() {
                 </button>
               )}
             </div>
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <StatCard label="Total Maps" value={graphs.length} icon={GitGraph} colorClass="text-primary" />
+        <StatCard label="My Maps" value={myMaps.length} icon={FileText} colorClass="text-secondary" />
+        <StatCard label="Shared" value={graphs.length - myMaps.length} icon={Globe} colorClass="text-accent" />
+        <StatCard label="Points" value="1,240" icon={Zap} colorClass="text-warning" />
+      </div>
 
-            {/* Stats Strip - Simplified */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-              <StatCard label="Total Maps" value={graphs.length} icon={GitGraph} colorClass="text-primary" />
-              <StatCard label="My Maps" value={myMaps.length} icon={FileText} colorClass="text-secondary" />
-              <StatCard label="Shared" value={graphs.length - myMaps.length} icon={Globe} colorClass="text-accent" />
-              <StatCard label="Points" value="1,240" icon={Zap} colorClass="text-warning" />
-            </div>
+      {/* Search & Sort - Responsive Layout */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-12" id="tour-search">
+        <div className="relative flex-grow w-full">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="w-full glass-panel border-border text-main pl-12 pr-6 py-4 rounded-2xl focus:outline-none focus:border-primary/50 text-sm transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2 bg-main/5 border border-border px-4 py-2 rounded-2xl shrink-0 w-full md:w-auto overflow-hidden">
+          <span className="text-[10px] font-bold text-muted uppercase tracking-widest whitespace-nowrap">Sort:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-transparent border-none text-xs font-bold text-main outline-none focus:ring-0 cursor-pointer py-1 pr-8 w-full"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="most-nodes">Most Nodes</option>
+          </select>
+        </div>
+      </div>
 
-            {/* Search */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-12" id="tour-search">
-              <div className="relative flex-grow w-full">
-                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full glass-panel border-border text-main pl-12 pr-6 py-4 rounded-2xl focus:outline-none focus:border-primary/50 text-sm transition-all"
-                />
-              </div>
-              <div className="flex items-center gap-2 bg-main/5 border border-border px-4 py-2 rounded-2xl shrink-0">
-                <span className="text-[10px] font-bold text-muted uppercase tracking-widest whitespace-nowrap">Sort:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-transparent border-none text-xs font-bold text-main outline-none focus:ring-0 cursor-pointer py-1 pr-8"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="most-nodes">Most Nodes</option>
-                </select>
-              </div>
-            </div>
+      {/* Maps Grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="glass-card rounded-2xl p-6 h-64 animate-pulse relative overflow-hidden bg-main/5" />
+          ))}
+        </div>
+      ) : filteredGraphs.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel rounded-3xl py-32 text-center border-border relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-48 bg-primary/10 blur-[100px] rounded-full pointer-events-none"></div>
+          <div className="size-20 rounded-3xl bg-main/5 border border-border flex items-center justify-center mx-auto mb-8 group overflow-hidden relative">
+            <Sparkles size={32} className="text-primary animate-pulse relative z-10" />
+            <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:blur-2xl transition-all" />
+          </div>
+          <h3 className="font-display font-extrabold text-main mb-3 text-2xl tracking-tight uppercase italic">{searchTerm ? 'NO RESULTS FOUND' : 'START YOUR FIRST PROJECT'}</h3>
+          <p className="text-muted text-sm mb-10 max-w-sm mx-auto font-medium">{searchTerm ? 'Try a different search term.' : 'Begin your journey by creating a new visual map for your ideas.'}</p>
 
-            {/* Maps Grid */}
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="glass-card rounded-2xl p-6 h-64 animate-pulse relative overflow-hidden bg-main/5" />
-                ))}
-              </div>
-            ) : filteredGraphs.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-panel rounded-3xl py-32 text-center border-border relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-48 bg-primary/10 blur-[100px] rounded-full pointer-events-none"></div>
-                <div className="size-20 rounded-3xl bg-main/5 border border-border flex items-center justify-center mx-auto mb-8 group overflow-hidden relative">
-                  <Sparkles size={32} className="text-primary animate-pulse relative z-10" />
-                  <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:blur-2xl transition-all" />
-                </div>
-                <h3 className="font-display font-extrabold text-main mb-3 text-2xl tracking-tight">{searchTerm ? 'NO RESULTS FOUND' : 'START YOUR FIRST PROJECT'}</h3>
-                <p className="text-muted text-sm mb-10 max-w-sm mx-auto font-medium">{searchTerm ? 'Try a different search term.' : 'Begin your journey by creating a new visual map for your ideas.'}</p>
-
-                {!searchTerm && (
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-3 bg-primary text-background px-10 py-5 rounded-2xl font-display font-bold transition-all shadow-md mx-auto"
-                  >
-                    <Plus size={20} strokeWidth={3} />
-                    NEW BLANK MAP
-                  </button>
-                )}
-              </motion.div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredGraphs.map(graph => (
-                  <MapCard
-                    key={graph._id}
-                    graph={graph}
-                    user={user}
-                    onDelete={handleDeleteGraph}
-                    onDuplicate={handleDuplicateGraph}
-                    onEdit={handleEditClick}
-                  />
-                ))}
-              </div>
-            )}
+          {!searchTerm && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-3 bg-primary text-background px-10 py-5 rounded-2xl font-display font-bold transition-all shadow-md mx-auto"
+            >
+              <Plus size={20} strokeWidth={3} />
+              NEW BLANK MAP
+            </button>
+          )}
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredGraphs.map(graph => (
+            <MapCard
+              key={graph._id}
+              graph={graph}
+              user={user}
+              onDelete={handleDeleteGraph}
+              onDuplicate={handleDuplicateGraph}
+              onEdit={handleEditClick}
+            />
+          ))}
+        </div>
+      )}
+ )}
           </div>
         </div>
 
