@@ -263,30 +263,6 @@ function SidebarContent({
         </div>
       )}
 
-      <div className="mb-8">
-        <p className="text-[10px] text-muted font-bold uppercase tracking-[0.2em] mb-4 px-2">Community Activity</p>
-        <div className="space-y-4 px-2">
-          {activities.length === 0 ? (
-            <p className="text-[10px] text-muted font-bold uppercase tracking-widest italic opacity-50 px-1">No Recent Waves</p>
-          ) : (
-            activities.map((act, i) => (
-              <div key={i} className="flex gap-3 items-start group">
-                <div className={`mt-1.5 size-1.5 rounded-full shrink-0 shadow-[0_0_8px_currentColor] ${act.type === 'new_map' ? 'text-primary' : 'text-secondary'}`} />
-                <div className="flex flex-col">
-                  <p className="text-[11px] text-main font-bold leading-tight group-hover:text-primary transition-colors cursor-default">
-                    <span className="opacity-70">{act.user}</span>
-                    {act.type === 'new_map' ? ' mapped ' : ' trending: '}
-                    <span className="italic">{act.title}</span>
-                  </p>
-                  <p className="text-[9px] uppercase tracking-widest font-bold text-muted mt-1 opacity-50">
-                    {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
 
       <div className="mb-10">
         <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold mb-4 px-2">TEMPLATES</p>
@@ -308,31 +284,33 @@ function SidebarContent({
       </div>
 
       {user && (
-        <div className="mt-auto flex flex-col gap-3 p-4 rounded-2xl bg-main/5 border border-border group relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-          <div className="flex items-center gap-4 relative z-10">
-            <UserBadge level={user.level || 1} size="lg" showLabel={false} />
-            <div className="overflow-hidden flex-grow">
-              <p className="text-lg font-display font-extrabold text-main truncate tracking-tight">{user.username}</p>
-              <div className="flex justify-between items-center mt-1">
-                <p className="text-[10px] uppercase font-bold tracking-widest text-primary">Lv. {user.level || 1}</p>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-muted">{user.xp || 0} XP</p>
-              </div>
-              <div className="w-full h-1.5 bg-background rounded-full mt-2 overflow-hidden border border-border">
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-1000"
-                  style={{ width: `${((user.xp || 0) % 50) / 50 * 100}%` }}
-                />
+        <div className="mt-auto pt-10">
+          <div className="flex flex-col gap-3 p-4 rounded-2xl bg-main/5 border border-border group relative overflow-hidden shadow-inner">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+            <div className="flex items-center gap-4 relative z-10">
+              <UserBadge level={user.level || 1} size="lg" showLabel={false} />
+              <div className="overflow-hidden flex-grow">
+                <p className="text-base font-display font-extrabold text-main truncate tracking-tight">{user.username}</p>
+                <div className="flex justify-between items-center mt-0.5">
+                  <p className="text-[10px] uppercase font-black tracking-widest text-primary">Lv. {user.level || 1}</p>
+                  <p className="text-[9px] uppercase font-bold tracking-widest text-muted">{user.xp || 0} XP</p>
+                </div>
+                <div className="w-full h-1 bg-background rounded-full mt-2 overflow-hidden border border-border/50">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]"
+                    style={{ width: `${((user.xp || 0) % 50) / 50 * 100}%` }}
+                  />
+                </div>
               </div>
             </div>
+            <Link
+              to={`/profile/${user._id}`}
+              onClick={onInteraction}
+              className="w-full text-center py-2.5 bg-background/50 hover:bg-main/10 rounded-xl text-[10px] font-black font-display uppercase tracking-[0.2em] text-muted hover:text-main transition-all mt-2 border border-border/50 hover:border-border"
+            >
+              Access Profile
+            </Link>
           </div>
-          <Link
-            to={`/profile/${user._id}`}
-            onClick={onInteraction}
-            className="w-full text-center py-2 bg-background/50 hover:bg-main/10 rounded-xl text-xs font-bold font-display uppercase tracking-widest text-muted hover:text-main transition-colors mt-2"
-          >
-            View Profile
-          </Link>
         </div>
       )}
     </>
