@@ -11,11 +11,12 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/(assets|favicon.ico|vite.svg|pwa-.*|manifest.webmanifest|sw.js|workbox-.*)(.*)",
+      "dest": "/frontend/$1$2"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/frontend/index.html"
     }
   ]
 }
