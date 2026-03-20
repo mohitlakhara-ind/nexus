@@ -8,8 +8,8 @@ const router = express.Router();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Free tier model - gemini-1.5-flash (fast, free)
-const AI_MODEL = 'gemini-1.5-flash';
+// Free tier model
+const AI_MODEL = 'gemini-2.0-flash';
 
 const PERSONAS = [
   {
