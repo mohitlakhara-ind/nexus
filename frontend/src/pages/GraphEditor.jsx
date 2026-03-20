@@ -17,6 +17,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import CursorOverlay from '../components/CursorOverlay';
+import Logo from '../components/Logo';
 import {
   Plus,
   Save,

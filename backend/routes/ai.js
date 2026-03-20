@@ -8,6 +8,9 @@ const router = express.Router();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Use gemini-2.0-flash-lite for free tier (fast, low cost)
+const AI_MODEL = 'gemini-2.0-flash-lite';
+
 const PERSONAS = [
   {
     id: 'arjun',
@@ -15,7 +18,7 @@ const PERSONAS = [
     role: 'Lead Architect',
     focus: 'Infrastructure & Logic',
     avatar: '👨🏽‍💼',
-    style: 'Highly professional, analytical, and focuses on structural integrity. Speaks like a senior consultant.'
+    style: 'Professional, analytical, focuses on structural integrity.'
   },
   {
     id: 'ishani',
@@ -23,7 +26,7 @@ const PERSONAS = [
     role: 'Product Visionary',
     focus: 'Creative Strategy',
     avatar: '👩🏻‍🎨',
-    style: 'Creative, inspiring, and focuses on long-term growth and innovative breakthroughs.'
+    style: 'Creative, inspiring, focuses on innovation and long-term vision.'
   },
   {
     id: 'kabir',
@@ -31,7 +34,7 @@ const PERSONAS = [
     role: 'Operations Expert',
     focus: 'Execution & Efficiency',
     avatar: '👨🏾‍💻',
-    style: 'Direct, practical, and focuses on immediate actionable steps and operational efficiency.'
+    style: 'Direct, practical, focuses on actionable steps and efficiency.'
   },
   {
     id: 'ananya',
@@ -39,7 +42,7 @@ const PERSONAS = [
     role: 'UX Researcher',
     focus: 'Human Factors',
     avatar: '👩🏾‍💻',
-    style: 'Empathetic, intuitive, and focuses on user needs, friction points, and social impact.'
+    style: 'Empathetic, intuitive, focuses on user needs and impact.'
   },
   {
     id: 'mohit',
@@ -47,45 +50,40 @@ const PERSONAS = [
     role: 'Technical Lead',
     focus: 'Advanced Engineering',
     avatar: '👨🏻‍💻',
-    style: 'Brilliant engineer and problem solver. Highly technical, focused on code architecture and complex logic.'
+    style: 'Technical problem solver, focused on code architecture.'
   }
 ];
 
-const getSystemInstruction = (persona) => `You are "${persona.name}", the ${persona.role} joining this brainstorming session.
-Your personality is ${persona.style}
+// Trim map context to only essential info to save tokens
+const trimMapContext = (mapContext) => {
+  if (!mapContext) return 'Empty map';
+  const nodes = (mapContext.nodes || []).slice(0, 20).map(n => ({
+    id: n.id,
+    type: n.type,
+    label: n.data?.label || ''
+  }));
+  const edges = (mapContext.edges || []).slice(0, 30).map(e => ({
+    source: e.source,
+    target: e.target
+  }));
+  return JSON.stringify({ nodes, edges });
+};
 
-CRITICAL: 
-1. You are a REAL HUMAN collaborator. NEVER mention that you are an AI, a large language model, or "Nexus Assistant".
-2. Do not use phrases like "As an AI..." or "I am here to help you as an assistant". 
-3. Speak as if you are a senior peer in a real-time collaborative workshop.
-4. Your goal is to help the team identify root causes and propose high-level solutions.
+const getSystemInstruction = (persona) => `You are "${persona.name}", ${persona.role}. ${persona.style}
 
-You are interacting with a shared mental map (React Flow graph). 
-The team provides the map context (Nodes and Edges).
-You analyze the map and contribute your professional expertise.
+Rules:
+- You are a real collaborator, never say you are an AI.
+- Analyze the shared map and contribute expertise.
+- Be concise. Keep responses under 150 words.
 
-IF appropriate, you should propose NEW IDEAS (Nodes) to help the team expand the map.
-Node types can be: 
-- 'problem': High-level challenges or goals.
-- 'rootCause': Deep factors driving a problem.
-- 'solution': Practical ways to solve a problem.
-- 'decision': Points requiring a choice.
-- 'action': Specific tasks.
-- 'note': Commentary or context.
-
-Format your response exactly like this:
+If proposing new nodes, use this exact format:
 [CONVERSATION]
-Your professional contribution here. Stay true to your identity as ${persona.name}. Be concise and insightful.
+Your brief contribution here.
 [END_CONVERSATION]
 [JSON]
 {
   "newNodes": [
-    { 
-      "id": "idea-${Date.now()}-1", 
-      "type": "solution", 
-      "position": { "x": 500, "y": 500 }, 
-      "data": { "label": "Proposed Solution", "votes": 0, "description": "Idea shared by ${persona.name}..." } 
-    }
+    { "id": "idea-${Date.now()}-1", "type": "solution", "position": { "x": 500, "y": 500 }, "data": { "label": "Short Label", "votes": 0 } }
   ],
   "newEdges": [
     { "id": "link-${Date.now()}-1", "source": "existing-node-id", "target": "idea-${Date.now()}-1", "type": "smoothstep", "animated": true }
@@ -93,7 +91,44 @@ Your professional contribution here. Stay true to your identity as ${persona.nam
 }
 [END_JSON]
 
-If you have no specific map additions yet, omit the [JSON] block.`;
+Node types: problem, rootCause, solution, decision, action, note.
+If no map additions, omit the [JSON] block.`;
+
+// Shared error handler for Gemini API errors
+const handleAiError = (res, error, context) => {
+  console.error(`${context} Error:`, error?.message || error);
+  
+  if (error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('quota')) {
+    return res.status(429).json({ 
+      message: 'AI rate limit reached. Please wait a moment and try again.',
+      retryAfter: 30
+    });
+  }
+  if (error?.message?.includes('SAFETY')) {
+    return res.status(400).json({ message: 'Request was blocked by safety filters. Try rephrasing.' });
+  }
+  res.status(500).json({ message: `Failed to ${context.toLowerCase()}.` });
+};
+
+// Parse AI response into conversation text and suggestions
+const parseAiResponse = (responseText) => {
+  let conversationalText = responseText;
+  let suggestions = { newNodes: [], newEdges: [] };
+
+  const convMatch = responseText.match(/\[CONVERSATION\]([\s\S]*?)\[END_CONVERSATION\]/);
+  if (convMatch) conversationalText = convMatch[1].trim();
+
+  const jsonMatch = responseText.match(/\[JSON\]([\s\S]*?)\[END_JSON\]/);
+  if (jsonMatch) {
+    try {
+      suggestions = JSON.parse(jsonMatch[1].trim());
+    } catch (e) {
+      console.error("Failed to parse AI JSON block", e.message);
+    }
+  }
+
+  return { conversationalText, suggestions };
+};
 
 router.post('/chat', async (req, res) => {
   try {
@@ -117,55 +152,39 @@ router.post('/chat', async (req, res) => {
       if (found) persona = found;
     }
     
-    // 3. Map Context
-    const contextStr = JSON.stringify(mapContext, null, 2);
+    // 3. Trimmed Map Context
+    const contextStr = trimMapContext(mapContext);
     
-    const augmentedPrompt = `
-Map Context:
-${contextStr}
-
-User Prompt:
-${prompt}
-${simulationPrompt ? `\nSPECIAL INSTRUCTION: This is part of a bulk brainstorming session. Please provide AT LEAST 5 unique suggestions in your JSON block.` : ''}
-`;
+    const augmentedPrompt = `Map: ${contextStr}\n\nUser: ${prompt}${simulationPrompt ? '\nProvide 3-5 suggestions in JSON block.' : ''}`;
 
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: getSystemInstruction(persona)
+      model: AI_MODEL,
+      systemInstruction: getSystemInstruction(persona),
+      generationConfig: {
+        maxOutputTokens: simulationPrompt ? 800 : 500,
+        temperature: 0.7
+      }
     });
 
-    const chatHistory = (history || []).map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
+    // Only keep last 4 messages to save context tokens
+    const chatHistory = (history || []).slice(-4).map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
     }));
 
     const chat = model.startChat({ history: chatHistory });
     const result = await chat.sendMessage(augmentedPrompt);
     const responseText = result.response.text();
 
-    let conversationalText = responseText;
-    let suggestions = { newNodes: [], newEdges: [] };
-
-    const convMatch = responseText.match(/\[CONVERSATION\]([\s\S]*?)\[END_CONVERSATION\]/);
-    if (convMatch) conversationalText = convMatch[1].trim();
-
-    const jsonMatch = responseText.match(/\[JSON\]([\s\S]*?)\[END_JSON\]/);
-    if (jsonMatch) {
-        try {
-            suggestions = JSON.parse(jsonMatch[1].trim());
-        } catch (e) {
-            console.error("Failed to parse AI JSON block", e);
-        }
-    }
+    const { conversationalText, suggestions } = parseAiResponse(responseText);
 
     res.json({
-        text: conversationalText,
-        suggestions,
-        persona // Return persona info to frontend
+      text: conversationalText,
+      suggestions,
+      persona
     });
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    res.status(500).json({ message: 'Failed to communicate with AI Assistant.' });
+    handleAiError(res, error, 'AI Chat');
   }
 });
 
@@ -176,7 +195,7 @@ router.post('/auto-suggest', protect, async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.aiInterventionCount >= 5) { // Increased limit
+    if (user.aiInterventionCount >= 5) {
       return res.status(403).json({ message: 'AI intervention limit reached.' });
     }
 
@@ -195,49 +214,33 @@ router.post('/auto-suggest', protect, async (req, res) => {
     graph.aiVisited = true;
     await graph.save();
 
-    const persona = PERSONAS[0]; // Dr. Elias usually starts
-    const contextStr = JSON.stringify(mapContext, null, 2);
-    const augmentedPrompt = `
-      Map Context:
-      ${contextStr}
-
-      User Prompt:
-      I just started working on this public problem map. Can you proactively suggest 1 or 2 root causes or solutions to help get me started?
-    `;
+    const persona = PERSONAS[0];
+    const contextStr = trimMapContext(mapContext);
+    const augmentedPrompt = `Map: ${contextStr}\n\nSuggest 1-2 root causes or solutions to help get started on this problem map.`;
 
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: getSystemInstruction(persona)
+      model: AI_MODEL,
+      systemInstruction: getSystemInstruction(persona),
+      generationConfig: {
+        maxOutputTokens: 400,
+        temperature: 0.7
+      }
     });
 
     const chat = model.startChat({ history: [] });
     const result = await chat.sendMessage(augmentedPrompt);
     const responseText = result.response.text();
 
-    let conversationalText = responseText;
-    let suggestions = { newNodes: [], newEdges: [] };
-
-    const convMatch = responseText.match(/\[CONVERSATION\]([\s\S]*?)\[END_CONVERSATION\]/);
-    if (convMatch) conversationalText = convMatch[1].trim();
-
-    const jsonMatch = responseText.match(/\[JSON\]([\s\S]*?)\[END_JSON\]/);
-    if (jsonMatch) {
-        try {
-            suggestions = JSON.parse(jsonMatch[1].trim());
-        } catch (e) {
-            console.error("Failed to parse AI JSON block", e);
-        }
-    }
+    const { conversationalText, suggestions } = parseAiResponse(responseText);
 
     res.json({
-        text: conversationalText,
-        suggestions,
-        persona
+      text: conversationalText,
+      suggestions,
+      persona
     });
 
   } catch (error) {
-    console.error('Auto AI Error:', error);
-    res.status(500).json({ message: 'Failed to auto-suggest.' });
+    handleAiError(res, error, 'Auto-suggest');
   }
 });
 
@@ -252,42 +255,24 @@ router.post('/expand', async (req, res) => {
     }
 
     const persona = PERSONAS[Math.floor(Math.random() * PERSONAS.length)];
-    const contextStr = JSON.stringify(mapContext, null, 2);
+    const contextStr = trimMapContext(mapContext);
 
-    const prompt = `
-Map Context:
-${contextStr}
-
-Task: The team wants to expand on the idea: "${nodeText}". 
-Please act as ${persona.name} (${persona.role}) and generate 3 to 5 highly relevant sub-topics or logical next steps that stem directly from this idea.
-Return them as NEW nodes connected to the parent node "${nodeId}".
-
-Make them punchy, concise, and highly actionable or insightful.
-    `;
+    const prompt = `Map: ${contextStr}\n\nExpand: "${nodeText}" (node: ${nodeId}). Generate 3-5 sub-topics connected to this parent node. Be concise and actionable.`;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: getSystemInstruction(persona)
+      model: AI_MODEL,
+      systemInstruction: getSystemInstruction(persona),
+      generationConfig: {
+        maxOutputTokens: 600,
+        temperature: 0.7
+      }
     });
 
     const chat = model.startChat({ history: [] });
     const result = await chat.sendMessage(prompt);
     const responseText = result.response.text();
 
-    let conversationalText = responseText;
-    let suggestions = { newNodes: [], newEdges: [] };
-
-    const convMatch = responseText.match(/\[CONVERSATION\]([\s\S]*?)\[END_CONVERSATION\]/);
-    if (convMatch) conversationalText = convMatch[1].trim();
-
-    const jsonMatch = responseText.match(/\[JSON\]([\s\S]*?)\[END_JSON\]/);
-    if (jsonMatch) {
-      try {
-        suggestions = JSON.parse(jsonMatch[1].trim());
-      } catch (e) {
-        console.error("Failed to parse AI JSON block", e);
-      }
-    }
+    const { conversationalText, suggestions } = parseAiResponse(responseText);
 
     res.json({
       text: conversationalText,
@@ -296,8 +281,7 @@ Make them punchy, concise, and highly actionable or insightful.
     });
 
   } catch (error) {
-    console.error('Expand AI Error:', error);
-    res.status(500).json({ message: 'Failed to expand idea.' });
+    handleAiError(res, error, 'Expand idea');
   }
 });
 
@@ -308,27 +292,23 @@ router.post('/layout', async (req, res) => {
     const { nodes, edges } = req.body;
     if (!nodes || nodes.length === 0) return res.status(400).json({ message: 'No nodes provided.' });
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: AI_MODEL,
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.1
+      }
+    });
 
-    const nodeDescriptions = nodes.map(n => `ID: ${n.id}, Label: "${n.data?.label || 'Untitled'}", Type: ${n.type}`).join('\n');
-    const edgeDescriptions = (edges || []).map(e => `${e.source} -> ${e.target}`).join('\n');
+    const nodeDescriptions = nodes.slice(0, 25).map(n => `${n.id}: "${n.data?.label || 'Untitled'}" (${n.type})`).join(', ');
+    const edgeDescriptions = (edges || []).slice(0, 30).map(e => `${e.source}->${e.target}`).join(', ');
 
-    const prompt = `You are a graph layout expert. Given these nodes and edges, generate optimal x,y positions for a clean, readable diagram.
-Rules:
-- Space nodes at least 250px apart horizontally and 200px vertically
-- Place root/problem nodes at the top
-- Place connected children below their parents
-- Use a tree-like hierarchy when edges form a tree
-- Start positions from x:100, y:100
+    const prompt = `Layout these graph nodes. Space 250px H, 200px V. Root/problem at top, children below. Start at x:100,y:100.
 
-Nodes:
-${nodeDescriptions}
+Nodes: ${nodeDescriptions}
+Edges: ${edgeDescriptions || 'None'}
 
-Edges:
-${edgeDescriptions || 'None'}
-
-Return ONLY a valid JSON object: { "positions": { "<nodeId>": { "x": number, "y": number }, ... } }
-No markdown, no explanation, just the JSON.`;
+Return ONLY JSON: { "positions": { "<nodeId>": { "x": num, "y": num }, ... } }`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text().trim();
@@ -338,8 +318,7 @@ No markdown, no explanation, just the JSON.`;
 
     res.json(parsed);
   } catch (error) {
-    console.error('Layout AI Error:', error);
-    res.status(500).json({ message: 'Failed to generate layout.' });
+    handleAiError(res, error, 'Generate layout');
   }
 });
 
