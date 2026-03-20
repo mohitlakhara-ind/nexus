@@ -156,6 +156,7 @@ const GraphEditorInner = () => {
   const { setViewport, getViewport, setCenter, screenToFlowPosition } = useReactFlow();
   const [activeUsers, setActiveUsers] = useState({});
   const history = useHistory();
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   // Handlers
   const handleVote = useCallback((nodeId) => {
@@ -165,7 +166,7 @@ const GraphEditorInner = () => {
           ...node,
           data: { ...node.data, votes: (node.data.votes || 0) + 1, lastTouched: Date.now() }
         };
-        socketRef.current.emit('node-update', { roomId: id, node: updatedNode });
+        socketRef.current?.emit('node-update', { roomId: id, node: updatedNode });
 
         // Gamification: Award XP for voting
         if (useAuthStore.getState().isAuthenticated) {
@@ -664,20 +665,41 @@ const GraphEditorInner = () => {
   useEffect(() => {
     socketRef.current = io(SOCKET_URL, {
       transports: ['polling', 'websocket'],
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      timeout: 10000
+    });
+
+    // Connection state tracking
+    socketRef.current.on('connect', () => {
+      setIsSocketConnected(true);
+      // Re-join rooms on reconnect
+      if (id) {
+        socketRef.current.emit('join_graph', { graphId: id, user });
+        socketRef.current.emit('join-room', id);
+      }
+    });
+
+    socketRef.current.on('disconnect', () => {
+      setIsSocketConnected(false);
+    });
+
+    socketRef.current.on('reconnect', () => {
+      setIsSocketConnected(true);
+      toast.success('Reconnected!', { icon: '🔄', duration: 2000 });
+      // Auto-save on reconnect to preserve any offline changes
+      if (hasUnsavedChanges) {
+        saveMap(true);
+      }
+    });
+
+    socketRef.current.on('connect_error', () => {
+      setIsSocketConnected(false);
     });
 
     if (id) {
-      socketRef.current.emit('join_graph', { graphId: id, user });
-      socketRef.current.emit('join-room', id);
-
       socketRef.current.on('presence_update', (users) => {
         setActiveUsers(users);
-        
-        // Notification: If I just joined, and I'm not the creator, notify the creator
-        // (This might trigger too often if not careful, but for a demo it's fine)
-        // Better: Only trigger once on successful fetchMap completion.
       });
       socketRef.current.on('cursor-move', ({ socketId, x, y }) => {
         setActiveUsers(prev => {
@@ -1195,7 +1217,7 @@ const GraphEditorInner = () => {
       userId: user._id
     };
 
-    socketRef.current.emit('chat-message', { roomId: id, message: messageData });
+    socketRef.current?.emit('chat-message', { roomId: id, message: messageData });
     setChatMessages(prev => [...prev, messageData]);
     setNewMessage('');
   };
@@ -1222,13 +1244,20 @@ const GraphEditorInner = () => {
     if (spotlightMode) {
       setSpotlightPos({ x: e.clientX, y: e.clientY });
     }
-    if (!socketRef.current || !showUI) return;
+    if (!socketRef.current || !showUI || !isSocketConnected) return;
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-    socketRef.current.emit('cursor-move', { roomId: id, x: position.x, y: position.y });
-  }, [id, screenToFlowPosition, showUI, spotlightMode]);
+    socketRef.current?.emit('cursor-move', { roomId: id, x: position.x, y: position.y });
+  }, [id, screenToFlowPosition, showUI, spotlightMode, isSocketConnected]);
 
   return (
     <div className="h-screen w-screen bg-background overflow-hidden relative" onPointerMove={handlePointerMove}>
+      {/* Disconnect Banner */}
+      {!isSocketConnected && !isLoading && (
+        <div className="absolute top-0 left-0 right-0 z-50 bg-warning/90 backdrop-blur-sm text-background text-center py-2 px-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+          <div className="size-2 rounded-full bg-background animate-pulse" />
+          Connecting to server... Your work is saved locally
+        </div>
+      )}
       <CursorOverlay activeUsers={activeUsers} currentSocketId={socketRef.current?.id} />
       <ReactFlow
         nodes={nodes.map(n => {
