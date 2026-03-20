@@ -662,7 +662,11 @@ const GraphEditorInner = () => {
 
   // Socket Connection & Real-time Collab
   useEffect(() => {
-    socketRef.current = io(SOCKET_URL);
+    socketRef.current = io(SOCKET_URL, {
+      transports: ['polling', 'websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000
+    });
 
     if (id) {
       socketRef.current.emit('join_graph', { graphId: id, user });
